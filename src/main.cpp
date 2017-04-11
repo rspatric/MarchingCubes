@@ -1,6 +1,7 @@
-/* Lab 5 base code - transforms using local matrix functions 
-   to be written by students - 
-	CPE 471 Cal Poly Z. Wood + S. Sueda
+/*
+ * Marching Cubes Lab
+ * Roslyn Patrick-Sunnes
+ * Rohin Chander
 */
 #include <iostream>
 #define GLEW_STATIC
@@ -22,10 +23,6 @@ GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog; //original roject 2b
 shared_ptr<Shape> shape;
-shared_ptr<Program> prog2; //phong
-shared_ptr<Program> prog3; //sillouhette
-shared_ptr<Program> prog4; //gourad
-shared_ptr<Shape> shape2;
 int shade = 0;
 float rot = 0;
 float light = 0;
@@ -188,33 +185,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-        else if(key == GLFW_KEY_P && action == GLFW_PRESS) {
-                if (shade == 3) {
-                     shade = 0;
-                }
-                else {
-                     shade++;
-                }
-        }
         else if(key == GLFW_KEY_A && action != GLFW_RELEASE) {
                rot += 0.05;
         }
         else if(key == GLFW_KEY_D && action != GLFW_RELEASE) {
                rot -= 0.05;
-        }
-        else if(key == GLFW_KEY_Q && action != GLFW_RELEASE) {
-               light += 0.05;
-        }
-        else if(key == GLFW_KEY_E && action != GLFW_RELEASE) {
-               light -= 0.05;
-        }
-        else if(key == GLFW_KEY_M && action != GLFW_RELEASE) {
-               if (material == 3) {
-                  material = 0;
-               }
-               else {
-                   material++;
-               }
         }
 }
 
@@ -259,37 +234,6 @@ static void init()
 	prog->addUniform("MV");
 	prog->addAttribute("vertPos");
 	prog->addAttribute("vertNor");
-
-        prog2 = make_shared<Program>();
-        prog2->setVerbose(true);
-        prog2->setShaderNames(RESOURCE_DIR + "phong_vert.glsl", RESOURCE_DIR+ "phong_frag.glsl");
-        prog2->init();
-        prog2->addUniform("P");
-        prog2->addUniform("MV");
-        prog2->addUniform("xLight");
-        prog2->addUniform("mat");
-        prog2->addAttribute("vertPos");
-        prog2->addAttribute("vertNor");
-
-        prog3 = make_shared<Program>();
-        prog3->setVerbose(true);
-        prog3->setShaderNames(RESOURCE_DIR + "silhouette_vert.glsl", RESOURCE_DIR + "silhouette_frag.glsl");
-        prog3->init();
-        prog3->addUniform("P");
-        prog3->addUniform("MV");
-        prog3->addAttribute("vertPos");
-        prog3->addAttribute("vertNor");
-
-        prog4 = make_shared<Program>();
-        prog4->setVerbose(true);
-        prog4->setShaderNames(RESOURCE_DIR + "gourad_vert.glsl", RESOURCE_DIR+"gourad_frag.glsl");
-        prog4->init();
-        prog4->addUniform("P");
-        prog4->addUniform("MV");
-        prog4->addUniform("xLight");
-        prog4->addUniform("mat");
-        prog4->addAttribute("vertPos");
-        prog4->addAttribute("vertNor");
 }
 
 static void render()
@@ -320,18 +264,7 @@ static void render()
         multMat(MV, trans, rotY);
 
         shared_ptr<Program> myProgram;
-        if (shade == 0) {
-            myProgram = prog;
-        }
-        else if (shade == 1) {
-            myProgram = prog2;
-        }
-        else if (shade == 2) {
-            myProgram = prog3;
-        }
-        else if (shade == 3) {
-            myProgram = prog4;
-        }
+        myProgram = prog;
         myProgram->bind();
         glUniformMatrix4fv(myProgram->getUniform("P"), 1, GL_FALSE, P);
         glUniformMatrix4fv(myProgram->getUniform("MV"), 1, GL_FALSE, MV);

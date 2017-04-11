@@ -183,10 +183,6 @@ lab5: CMakeFiles/lab5.dir/src/Shape.cpp.o
 lab5: CMakeFiles/lab5.dir/build.make
 lab5: /Users/roslynsierra/Graphics/glfw/debug/src/libglfw3.a
 lab5: /usr/local/Cellar/glew/1.11.0/lib/libGLEW.a
-lab5: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/Cocoa.framework
-lab5: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/IOKit.framework
-lab5: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/CoreFoundation.framework
-lab5: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/System/Library/Frameworks/CoreVideo.framework
 lab5: CMakeFiles/lab5.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable lab5"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lab5.dir/link.txt --verbose=$(VERBOSE)
