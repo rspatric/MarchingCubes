@@ -27,9 +27,9 @@ string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog; //original roject 2b
 
 int g_width, g_height; 
-int cubeSize = 20;
+int cubeSize = 10;
 GLuint VertexArrayID;
-GLfloat g_vertex_buffer_data[240000]; //100*100*100 cube, vertex data for all x, y, z points
+GLfloat g_vertex_buffer_data[3000]; //100*100*100 cube, vertex data for all x, y, z points
 GLuint vertexbuffer;
 
 void printMat(float *A, const char *name = 0)
@@ -188,9 +188,9 @@ void initPoints() {
    int current = 0.0;
    //initialize points for 100*100*100 cube
    while (current < 3 * cubeSize * cubeSize * cubeSize) {
-      g_vertex_buffer_data[current++] = (float) (i++) / 100.0f - 0.5f; //x
-      g_vertex_buffer_data[current++] = (float) j / 100.0f - 0.5f; //y
-      g_vertex_buffer_data[current++] = (float) k / 100.0f; //z
+      g_vertex_buffer_data[current++] = (float) (i++) / (float) cubeSize - 0.5f; //x
+      g_vertex_buffer_data[current++] = (float) j / (float) cubeSize - 0.5f; //y
+      g_vertex_buffer_data[current++] = (float) k / (float) cubeSize; //z
       if (count++ == cubeSize) {
          count = 0;
          count2++;
@@ -297,7 +297,7 @@ static void render()
    //key function to get up how many elements to pull out at a time (2)
    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
    //send timer value here
-   glPointSize(50);
+   glPointSize(25);
    //actually draw from vertex 0, 2 vertices
    glDrawArrays(GL_POINTS, 0, cubeSize * cubeSize * cubeSize);
    glDisableVertexAttribArray(0);
