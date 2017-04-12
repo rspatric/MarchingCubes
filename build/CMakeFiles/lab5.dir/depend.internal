@@ -178,6 +178,10 @@ CMakeFiles/lab5.dir/src/main.cpp.o
  /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/constants.inl
  /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/matrix_transform.hpp
  /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/matrix_transform.inl
+ /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/quaternion.hpp
+ /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/quaternion.inl
+ /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/type_ptr.hpp
+ /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/type_ptr.inl
  /usr/local/Cellar/glm/0.9.6.1/include/glm/gtx/transform.hpp
  /usr/local/Cellar/glm/0.9.6.1/include/glm/gtx/transform.inl
  /usr/local/Cellar/glm/0.9.6.1/include/glm/integer.hpp

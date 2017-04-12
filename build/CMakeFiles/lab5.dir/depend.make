@@ -177,6 +177,10 @@ CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gt
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/constants.inl
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/matrix_transform.hpp
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/matrix_transform.inl
+CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/quaternion.hpp
+CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/quaternion.inl
+CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/type_ptr.hpp
+CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtc/type_ptr.inl
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtx/transform.hpp
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/gtx/transform.inl
 CMakeFiles/lab5.dir/src/main.cpp.o: /usr/local/Cellar/glm/0.9.6.1/include/glm/integer.hpp
