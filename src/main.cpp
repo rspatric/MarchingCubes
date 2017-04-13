@@ -45,7 +45,14 @@ struct Triangle {
 };
 
 struct Cube {
-	Point p[8];
+	Point p1;
+        Point p2;
+        Point p3;
+        Point p4;
+        Point p5;
+        Point p6;
+        Point p7;
+        Point p8;
 };
 
 //cubeSize^3
@@ -76,7 +83,7 @@ void createPerspectiveMat(float *m, float fovy, float aspect, float zNear, float
 }
 
 /*
- * This method initializes all the x, y, and z coordinates for all the points in 
+ * This method initializes all the x, y, and z coordinates for all the points in
  * a 100 * 100 * 100 cube.
  */
 void initPoints() {
@@ -95,7 +102,7 @@ void initPoints() {
          j++;
          i = 0;
       }
-      else if (count2 == cubeSize) {
+      if (count2 == cubeSize) {
          count = 0;
          count2 = 0;
          i = 0;
@@ -108,7 +115,19 @@ void initPoints() {
 }
 
 void initAllCubes() {
+   //need to get index of point in points that is upper left corner of cube
+   int index = 0;
 
+   //init a cube a point index
+   Point p1 = points[index];
+   Point p2 = points[index+1];
+   Point p3 = points[index+cubeSize];
+   Point p4 = points[index+cubeSize+1];
+   Point p5 = points[index+(cubeSize*cubeSize)];
+   Point p6 = points[index+(cubeSize*cubeSize)+1];
+   Point p7 = points[index+(cubeSize*cubeSize)+cubeSize];
+   Point p8 = points[index+(cubeSize*cubeSize)+cubeSize+1];
+   Cube newCube = {p1, p2, p3, p4, p5, p6, p7, p8}; 
 }
 
 void initCube() {
@@ -123,7 +142,8 @@ void initCube() {
 	float difx = maxX - minX;
 	float dify = maxY - minY;
 	float difz = maxZ - minZ;
-	float sideOfCube = max(max(difx, dify), difz);
+	//this doesn't work when using namespace std
+        //float sideOfCube = max(max(difx, dify), difz);
 }
 
 static void error_callback(int error, const char *description)
