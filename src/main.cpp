@@ -33,26 +33,26 @@ GLfloat g_vertex_buffer_data[3000]; //3*cubeSize^3, vertex data for all x, y, z 
 GLuint vertexbuffer;
 
 struct Point {
-	float x;
-	float y;
-	float z;
+   float x;
+   float y;
+   float z;
 };
 
 struct Triangle {
-	Point p1;
-	Point p2;
-	Point p3;
+   Point p1;
+   Point p2;
+   Point p3;
 };
 
 struct Cube {
-	Point p1;
-        Point p2;
-        Point p3;
-        Point p4;
-        Point p5;
-        Point p6;
-        Point p7;
-        Point p8;
+   Point p1;
+   Point p2;
+   Point p3;
+   Point p4;
+   Point p5;
+   Point p6;
+   Point p7;
+   Point p8;
 };
 
 //cubeSize^3
@@ -109,7 +109,7 @@ void initPoints() {
          j = 0;
          k++;         
       }
-	  points[current/3 - 1] = { i, j, k };
+      points[current/3 - 1] = { i, j, k };
       cout << i << "," << j << "," << k << endl;
    }
 }
@@ -117,196 +117,215 @@ void initPoints() {
 void initAllCubes() {
    //need to get index of point in points that is upper left corner of cube
    int index = 0;
+   int current = 0;
+   //index in points array
+   int pointIndex = 0;
+   int count = 0; //the rows going down
+   int count2 = 0; //the layers coming forward
 
-   //init a cube a point index
-   Point p1 = points[index];
-   Point p2 = points[index+1];
-   Point p3 = points[index+cubeSize];
-   Point p4 = points[index+cubeSize+1];
-   Point p5 = points[index+(cubeSize*cubeSize)];
-   Point p6 = points[index+(cubeSize*cubeSize)+1];
-   Point p7 = points[index+(cubeSize*cubeSize)+cubeSize];
-   Point p8 = points[index+(cubeSize*cubeSize)+cubeSize+1];
-   Cube newCube = {p1, p2, p3, p4, p5, p6, p7, p8}; 
-}
-
-void initCube() {
-	float radius = 1;
-	// implicit sphere eq x^2 + y^2 + z^2 = 1
-	float maxX = sqrt(radius);
-	float maxY = sqrt(radius);
-	float maxZ = sqrt(radius);
-	float minX = -sqrt(radius);
-	float minY = -sqrt(radius);
-	float minZ = -sqrt(radius);
-	float difx = maxX - minX;
-	float dify = maxY - minY;
-	float difz = maxZ - minZ;
-	//this doesn't work when using namespace std
-        //float sideOfCube = max(max(difx, dify), difz);
-}
-
-static void error_callback(int error, const char *description)
-{
-   cerr << description << endl;
-}
-
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
-{
-   if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-      glfwSetWindowShouldClose(window, GL_TRUE);
+   while (current++ < (cubeSize - 1) * (cubeSize - 1) * (cubeSize - 1)) {
+      if (count++ == cubeSize - 1) {
+         count = 0;
+         pointIndex++;
+      }
+      if (count2++ == (cubeSize - 1) * (cubeSize - 1)) {
+         count = 1;
+         count2 = 0;
+         pointIndex += cubeSize + 1;
+      }
+      //init a new cube a point index
+      Point p1 = points[pointIndex];
+      Point p2 = points[pointIndex+1];
+      Point p3 = points[pointIndex+cubeSize];
+      Point p4 = points[pointIndex+cubeSize+1];
+      Point p5 = points[pointIndex+(cubeSize*cubeSize)];
+      Point p6 = points[pointIndex+(cubeSize*cubeSize)+1];
+      Point p7 = points[pointIndex+(cubeSize*cubeSize)+cubeSize];
+      Point p8 = points[pointIndex+(cubeSize*cubeSize)+cubeSize+1];
+      Cube newCube = {p1, p2, p3, p4, p5, p6, p7, p8}; 
+      cubes[index] = newCube; 
+      index++;
+      pointIndex++;
    }
 }
 
-
-static void mouse_callback(GLFWwindow *window, int button, int action, int mods)
-{
-   double posX, posY;
-   if (action == GLFW_PRESS) {
-      glfwGetCursorPos(window, &posX, &posY);
-      cout << "Pos X " << posX <<  " Pos Y " << posY << endl;
+   void initCube() {
+      float radius = 1;
+      // implicit sphere eq x^2 + y^2 + z^2 = 1
+      float maxX = sqrt(radius);
+      float maxY = sqrt(radius);
+      float maxZ = sqrt(radius);
+      float minX = -sqrt(radius);
+      float minY = -sqrt(radius);
+      float minZ = -sqrt(radius);
+      float difx = maxX - minX;
+      float dify = maxY - minY;
+      float difz = maxZ - minZ;
+      //this doesn't work when using namespace std
+      //float sideOfCube = max(max(difx, dify), difz);
    }
-}
 
-static void resize_callback(GLFWwindow *window, int width, int height) {
-   g_width = width;
-   g_height = height;
-   glViewport(0, 0, width, height);
-}
-
-static void init()
-{
-   GLSL::checkVersion();
-
-   // Set background color.
-   glClearColor(.12f, .34f, .56f, 1.0f);
-   // Enable z-buffer test.
-   glEnable(GL_DEPTH_TEST);
-
-   // Initialize the GLSL program.
-   prog = make_shared<Program>();
-   prog->setVerbose(true);
-   prog->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
-   prog->init();
-   prog->addUniform("P");
-   prog->addUniform("MV");
-   prog->addAttribute("vertPos");
-
-   //initGeom
-   //Generate the VAO
-   glGenVertexArrays(1, &VertexArrayID);
-   glBindVertexArray(VertexArrayID);
-   //generate vertex buffer to hand off to OGL
-   glGenBuffers(1, &vertexbuffer);
-   //set the current state to focus on our vertex buffer
-   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-}
-
-static void render()
-{
-   int width, height;
-   glfwGetFramebufferSize(window, &width, &height);
-   float aspect = width/(float)height;
-   glViewport(0, 0, width, height);
-
-   // Clear framebuffer.
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-   auto P = make_shared<MatrixStack>();
-   auto MV = make_shared<MatrixStack>();
-   // Apply orthographic projection.
-   P->pushMatrix();
-    
-   if (width > height) {
-      P->ortho(-1*aspect, aspect, -1, 1, -1, 100.0f);
-   } else {
-      P->ortho(-1, 1, -1/aspect, 1/aspect, -1, 100.0f);
+   static void error_callback(int error, const char *description)
+   {
+      cerr << description << endl;
    }
-   MV->pushMatrix();
-   
-   prog->bind();
-   //send the matrices to the shaders
-   glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));
-   glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, value_ptr(MV->topMatrix()));
-   //we need to set up the vertex array
-   glEnableVertexAttribArray(0);
-   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-   //key function to get up how many elements to pull out at a time (2)
-   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-   //send timer value here
-   glPointSize(25);
-   //actually draw from vertex 0, 2 vertices
-   glDrawArrays(GL_POINTS, 0, cubeSize * cubeSize * cubeSize);
-   glDisableVertexAttribArray(0);
-   prog->unbind();
-}
 
-int main(int argc, char **argv)
-{
-   if(argc < 2) {
-      cout << "Please specify the resource directory." << endl;
+   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+   {
+      if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+         glfwSetWindowShouldClose(window, GL_TRUE);
+      }
+   }
+
+
+   static void mouse_callback(GLFWwindow *window, int button, int action, int mods)
+   {
+      double posX, posY;
+      if (action == GLFW_PRESS) {
+         glfwGetCursorPos(window, &posX, &posY);
+         cout << "Pos X " << posX <<  " Pos Y " << posY << endl;
+      }
+   }
+
+   static void resize_callback(GLFWwindow *window, int width, int height) {
+      g_width = width;
+      g_height = height;
+      glViewport(0, 0, width, height);
+   }
+
+   static void init()
+   {
+      GLSL::checkVersion();
+
+      // Set background color.
+      glClearColor(.12f, .34f, .56f, 1.0f);
+      // Enable z-buffer test.
+      glEnable(GL_DEPTH_TEST);
+
+      // Initialize the GLSL program.
+      prog = make_shared<Program>();
+      prog->setVerbose(true);
+      prog->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
+      prog->init();
+      prog->addUniform("P");
+      prog->addUniform("MV");
+      prog->addAttribute("vertPos");
+
+      //initGeom
+      //Generate the VAO
+      glGenVertexArrays(1, &VertexArrayID);
+      glBindVertexArray(VertexArrayID);
+      //generate vertex buffer to hand off to OGL
+      glGenBuffers(1, &vertexbuffer);
+      //set the current state to focus on our vertex buffer
+      glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+   }
+
+   static void render()
+   {
+      int width, height;
+      glfwGetFramebufferSize(window, &width, &height);
+      float aspect = width/(float)height;
+      glViewport(0, 0, width, height);
+
+      // Clear framebuffer.
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      auto P = make_shared<MatrixStack>();
+      auto MV = make_shared<MatrixStack>();
+      // Apply orthographic projection.
+      P->pushMatrix();
+
+      if (width > height) {
+         P->ortho(-1*aspect, aspect, -1, 1, -1, 100.0f);
+      } else {
+         P->ortho(-1, 1, -1/aspect, 1/aspect, -1, 100.0f);
+      }
+      MV->pushMatrix();
+
+      prog->bind();
+      //send the matrices to the shaders
+      glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, value_ptr(P->topMatrix()));
+      glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, value_ptr(MV->topMatrix()));
+      //we need to set up the vertex array
+      glEnableVertexAttribArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+      //key function to get up how many elements to pull out at a time (2)
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+      //send timer value here
+      glPointSize(25);
+      //actually draw from vertex 0, 2 vertices
+      glDrawArrays(GL_POINTS, 0, cubeSize * cubeSize * cubeSize);
+      glDisableVertexAttribArray(0);
+      prog->unbind();
+   }
+
+   int main(int argc, char **argv)
+   {
+      if(argc < 2) {
+         cout << "Please specify the resource directory." << endl;
+         return 0;
+      }
+      RESOURCE_DIR = argv[1] + string("/");
+
+      // Set error callback.
+      glfwSetErrorCallback(error_callback);
+      // Initialize the library.
+      if(!glfwInit()) {
+         return -1;
+      }
+      //request the highest possible version of OGL - important for mac
+      glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+
+      // Create a windowed mode window and its OpenGL context.
+      window = glfwCreateWindow(640, 480, "Marching Cubes", NULL, NULL);
+      if(!window) {
+         glfwTerminate();
+         return -1;
+      }
+      // Make the window's context current.
+      glfwMakeContextCurrent(window);
+      // Initialize GLEW.
+      glewExperimental = true;
+      if(glewInit() != GLEW_OK) {
+         cerr << "Failed to initialize GLEW" << endl;
+         return -1;
+      }
+      //weird bootstrap of glGetError
+      glGetError();
+      cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
+      cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+
+      // Set vsync.
+      glfwSwapInterval(1);
+      // Set keyboard callback.
+      glfwSetKeyCallback(window, key_callback);
+      //set the mouse call back
+      glfwSetMouseButtonCallback(window, mouse_callback);
+      //set the window resize call back
+      glfwSetFramebufferSizeCallback(window, resize_callback);
+
+      initCube();
+      initPoints();
+
+      // Initialize scene. Note geometry initialized in init now
+      init();
+
+      // Loop until the user closes the window.
+      while(!glfwWindowShouldClose(window)) {
+         // Render scene.
+         render();
+         // Swap front and back buffers.
+         glfwSwapBuffers(window);
+         // Poll for and process events.
+         glfwPollEvents();
+      }
+      // Quit program.
+      glfwDestroyWindow(window);
+      glfwTerminate();
       return 0;
    }
-   RESOURCE_DIR = argv[1] + string("/");
-
-   // Set error callback.
-   glfwSetErrorCallback(error_callback);
-   // Initialize the library.
-   if(!glfwInit()) {
-      return -1;
-   }
-   //request the highest possible version of OGL - important for mac
-   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-
-   // Create a windowed mode window and its OpenGL context.
-   window = glfwCreateWindow(640, 480, "Marching Cubes", NULL, NULL);
-   if(!window) {
-      glfwTerminate();
-      return -1;
-   }
-   // Make the window's context current.
-   glfwMakeContextCurrent(window);
-   // Initialize GLEW.
-   glewExperimental = true;
-   if(glewInit() != GLEW_OK) {
-      cerr << "Failed to initialize GLEW" << endl;
-      return -1;
-   }
-   //weird bootstrap of glGetError
-   glGetError();
-   cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
-   cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-
-   // Set vsync.
-   glfwSwapInterval(1);
-   // Set keyboard callback.
-   glfwSetKeyCallback(window, key_callback);
-   //set the mouse call back
-   glfwSetMouseButtonCallback(window, mouse_callback);
-   //set the window resize call back
-   glfwSetFramebufferSizeCallback(window, resize_callback);
-
-   initCube();
-   initPoints();
-
-   // Initialize scene. Note geometry initialized in init now
-   init();
-
-   // Loop until the user closes the window.
-   while(!glfwWindowShouldClose(window)) {
-      // Render scene.
-      render();
-      // Swap front and back buffers.
-      glfwSwapBuffers(window);
-      // Poll for and process events.
-      glfwPollEvents();
-   }
-   // Quit program.
-   glfwDestroyWindow(window);
-   glfwTerminate();
-   return 0;
-}
