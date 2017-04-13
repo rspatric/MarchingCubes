@@ -17,8 +17,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 /* to use glee */
-#define GLEE_OVERWRITE_GL_FUNCTIONS
-#include "glee.hpp"
+//#define GLEE_OVERWRITE_GL_FUNCTIONS
+//#include "glee.hpp"
 
 using namespace std;
 
@@ -29,131 +29,29 @@ shared_ptr<Program> prog; //original roject 2b
 int g_width, g_height; 
 int cubeSize = 10;
 GLuint VertexArrayID;
-GLfloat g_vertex_buffer_data[3000]; //100*100*100 cube, vertex data for all x, y, z points
+GLfloat g_vertex_buffer_data[3000]; //3*cubeSize^3, vertex data for all x, y, z points
 GLuint vertexbuffer;
 
-void printMat(float *A, const char *name = 0)
-{
-   // OpenGL uses col-major ordering:
-   // [ 0  4  8 12]
-   // [ 1  5  9 13]
-   // [ 2  6 10 14]
-   // [ 3  7 11 15]
-   // The (i,j)th element is A[i+4*j].
-   if(name) {
-      printf("%s=[\n", name);
-   }
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         printf("%- 5.2f ", A[i+4*j]);
-      }
-      printf("\n");
-   }
-   if(name) {
-      printf("];");
-   }
-   printf("\n");
-}
+struct Point {
+	float x;
+	float y;
+	float z;
+};
 
-void createIdentityMat(float *M)
-{
-   //set all values to zero
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         M[i*4+j] = 0;
-      }
-   }
-   //overwrite diagonal with 1s
-   M[0] = M[5] = M[10] = M[15] = 1;
-}
+struct Triangle {
+	Point p1;
+	Point p2;
+	Point p3;
+};
 
-void createTranslateMat(float *T, float x, float y, float z)
-{
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         T[i*4+j] = 0;
-      }
-   }
-   T[0] = T[5] = T[10] = T[15] = 1;
-   T[12] = x;
-   T[13] = y;
-   T[14] = z;
-}
+struct Cube {
+	Point p[8];
+};
 
-void createScaleMat(float *S, float x, float y, float z)
-{
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         S[i*4+j] = 0;
-      }
-   }
-   S[15] = 1;
-   S[0] = x;
-   S[5] = y;
-   S[10] = z;
-}
-
-void createRotateMatX(float *R, float radians)
-{ 
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         R[i*4+j] = 0;
-      }
-   }
-   R[0] = R[5] = R[10] = R[15] = 1;
-   R[5] = cos(radians);
-   R[9] = sin(radians);
-   R[6] = -1 * sin(radians);
-   R[10] = cos(radians);
-}
-
-void createRotateMatY(float *R, float radians)
-{
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         R[i*4+j] = 0;
-      }
-   }
-   R[0] = R[5] = R[10] = R[15] = 1;
-   R[0] = cos(radians);
-   R[8] = -1 * sin(radians);          
-   R[2] = sin(radians);
-   R[10] = cos(radians);
-}
-
-void createRotateMatZ(float *R, float radians)
-{
-   for(int i = 0; i < 4; ++i) {
-      for(int j = 0; j < 4; ++j) {
-         R[i*4+j] = 0;
-      }
-   }
-   R[0] = R[5] = R[10] = R[15] = 1;
-   R[0] = cos(radians);
-   R[4] = sin(radians);
-   R[1] = -1 * sin(radians);
-   R[5] = cos(radians);
-}
-
-void multMat(float *C, const float *A, const float *B)
-{
-   float c = 0;
-   for(int k = 0; k < 4; ++k) {
-      // Process kth column of C
-      for(int i = 0; i < 4; ++i) {
-         // Process ith row of C.
-         // The (i,k)th element of C is the dot product
-         // of the ith row of A and kth col of B.
-         c = 0;
-         //vector dot
-         for(int j = 0; j < 4; ++j) {
-            c += A[k+j*4]*B[j+4*i]; 
-         }
-         C[k+4*i] = c;
-
-      }
-   }
-}
+//cubeSize^3
+Point points[1000];
+//(cubeSize - 1)^2
+Cube cubes[81];
 
 void createPerspectiveMat(float *m, float fovy, float aspect, float zNear, float zFar)
 {
@@ -204,8 +102,28 @@ void initPoints() {
          j = 0;
          k++;         
       }
+	  points[current/3 - 1] = { i, j, k };
       cout << i << "," << j << "," << k << endl;
    }
+}
+
+void initAllCubes() {
+
+}
+
+void initCube() {
+	float radius = 1;
+	// implicit sphere eq x^2 + y^2 + z^2 = 1
+	float maxX = sqrt(radius);
+	float maxY = sqrt(radius);
+	float maxZ = sqrt(radius);
+	float minX = -sqrt(radius);
+	float minY = -sqrt(radius);
+	float minZ = -sqrt(radius);
+	float difx = maxX - minX;
+	float dify = maxY - minY;
+	float difz = maxZ - minZ;
+	float sideOfCube = max(max(difx, dify), difz);
 }
 
 static void error_callback(int error, const char *description)
@@ -352,6 +270,7 @@ int main(int argc, char **argv)
    //set the window resize call back
    glfwSetFramebufferSizeCallback(window, resize_callback);
 
+   initCube();
    initPoints();
 
    // Initialize scene. Note geometry initialized in init now
