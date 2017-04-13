@@ -134,14 +134,14 @@ void initAllCubes() {
          pointIndex += cubeSize + 1;
       }
       //init a new cube a point index
-      Point p1 = points[pointIndex];
-      Point p2 = points[pointIndex+1];
-      Point p3 = points[pointIndex+cubeSize];
-      Point p4 = points[pointIndex+cubeSize+1];
-      Point p5 = points[pointIndex+(cubeSize*cubeSize)];
-      Point p6 = points[pointIndex+(cubeSize*cubeSize)+1];
-      Point p7 = points[pointIndex+(cubeSize*cubeSize)+cubeSize];
-      Point p8 = points[pointIndex+(cubeSize*cubeSize)+cubeSize+1];
+      Point p5 = points[pointIndex];
+      Point p6 = points[pointIndex+1];
+      Point p1 = points[pointIndex+cubeSize];
+      Point p2 = points[pointIndex+cubeSize+1];
+      Point p8 = points[pointIndex+(cubeSize*cubeSize)];
+      Point p7 = points[pointIndex+(cubeSize*cubeSize)+1];
+      Point p4 = points[pointIndex+(cubeSize*cubeSize)+cubeSize];
+      Point p3 = points[pointIndex+(cubeSize*cubeSize)+cubeSize+1];
       Cube newCube = {p1, p2, p3, p4, p5, p6, p7, p8}; 
       cubes[index] = newCube; 
       index++;
