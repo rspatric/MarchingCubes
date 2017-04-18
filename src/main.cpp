@@ -27,6 +27,7 @@ string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog; //original roject 2b
 
 int g_width, g_height; 
+float isolvl = 1.0;
 int cubeSize = 10;
 GLuint VertexArrayID;
 GLfloat g_vertex_buffer_data[3000]; //3*cubeSize^3, vertex data for all x, y, z points
@@ -60,6 +61,8 @@ struct Cube {
 Point points[1000];
 //(cubeSize - 1)^2
 Cube cubes[81];
+Triangle *theTriangles;
+
 
 /*
  *    Linearly interpolate the position where an isosurface cuts
@@ -454,8 +457,6 @@ int Polygonise(Cube grid, float isolevel, Triangle *triangles)
       ntriang++;
    }
 
-   //pass triangles to the shaders
-
    return(ntriang);
 }
 
@@ -715,6 +716,12 @@ int main(int argc, char **argv)
 
    initCube();
    initPoints();
+
+   //(cubeSize - 1)^2
+   int i;
+   for (i = 0; i < 81; i++) {
+      Polygonise(cubes[i], isolvl, theTriangles);
+   }
 
    // Initialize scene. Note geometry initialized in init now
    init();
