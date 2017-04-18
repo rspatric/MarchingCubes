@@ -63,8 +63,8 @@ struct Cube {
 
 //cubeSize^3
 Point points[1000];
-//(cubeSize - 1)^2
-Cube cubes[81];
+//(cubeSize - 1)^3
+Cube cubes[729];
 Triangle *theTriangles;
 
 /*
@@ -413,8 +413,6 @@ int Polygonise(Cube grid, float isolevel, Triangle *triangles)
    if (edgeTable[cubeindex] == 0)
       return(0);
 
-   cout << "hi" << endl;
-
    /* Find the vertices where the surface intersects the cube */
    if (edgeTable[cubeindex] & 1)
       vertlist[0] =
@@ -455,13 +453,11 @@ int Polygonise(Cube grid, float isolevel, Triangle *triangles)
 
    /* Create the triangle */
    ntriang = 0;
-   cout << "size" << triTable[cubeindex][i] << endl;
    for (i=0;triTable[cubeindex][i]!=-1;i+=3) {
       triangles[ntriang].p1 = vertlist[triTable[cubeindex][i  ]];
       triangles[ntriang].p2 = vertlist[triTable[cubeindex][i+1]];
       triangles[ntriang].p3 = vertlist[triTable[cubeindex][i+2]];
       ntriang++;
-      cout << ntriang << endl;
    }
 
    return(ntriang);
@@ -536,7 +532,7 @@ void initAllCubes() {
    int count2 = 0; //the layers coming forward
 
    while (current++ < (cubeSize - 1) * (cubeSize - 1) * (cubeSize - 1)) {
-     cout << "current = " << current << " count = " << count << " count2 = " << count2 << " pointInd = " << pointIndex << endl;
+     cout << "current = " << current << " count = " << count << " count2 = " << count2 << " pointInd = " << pointIndex << " index = " << index << endl;
       if (count++ == cubeSize - 1) {
          count = 0;
          pointIndex++;
@@ -736,9 +732,9 @@ int main(int argc, char **argv)
 
    cout << "just before polygonise" << endl;
 
-   //(cubeSize - 1)^2
+   //(cubeSize - 1)^3
    int i;
-   for (i = 0; i < 81; i++) {
+   for (i = 0; i < 729; i++) {
       int nTri = Polygonise(cubes[i], isolvl, theTriangles);
       cout << nTri << endl;
       int j;
