@@ -33,6 +33,10 @@ GLuint VertexArrayID;
 GLfloat g_vertex_buffer_data[3000]; //3*cubeSize^3, vertex data for all x, y, z points
 GLuint vertexbuffer;
 
+vector<float> posBuf;
+GLuint posBufID;
+GLint vertPosAttrID;
+
 struct Point {
    float x;
    float y;
@@ -62,7 +66,6 @@ Point points[1000];
 //(cubeSize - 1)^2
 Cube cubes[81];
 Triangle *theTriangles;
-
 
 /*
  *    Linearly interpolate the position where an isosurface cuts
@@ -410,6 +413,8 @@ int Polygonise(Cube grid, float isolevel, Triangle *triangles)
    if (edgeTable[cubeindex] == 0)
       return(0);
 
+   cout << "hi" << endl;
+
    /* Find the vertices where the surface intersects the cube */
    if (edgeTable[cubeindex] & 1)
       vertlist[0] =
@@ -450,11 +455,13 @@ int Polygonise(Cube grid, float isolevel, Triangle *triangles)
 
    /* Create the triangle */
    ntriang = 0;
+   cout << "size" << triTable[cubeindex][i] << endl;
    for (i=0;triTable[cubeindex][i]!=-1;i+=3) {
       triangles[ntriang].p1 = vertlist[triTable[cubeindex][i  ]];
       triangles[ntriang].p2 = vertlist[triTable[cubeindex][i+1]];
       triangles[ntriang].p3 = vertlist[triTable[cubeindex][i+2]];
       ntriang++;
+      cout << ntriang << endl;
    }
 
    return(ntriang);
@@ -529,6 +536,7 @@ void initAllCubes() {
    int count2 = 0; //the layers coming forward
 
    while (current++ < (cubeSize - 1) * (cubeSize - 1) * (cubeSize - 1)) {
+     cout << "current = " << current << " count = " << count << " count2 = " << count2 << " pointInd = " << pointIndex << endl;
       if (count++ == cubeSize - 1) {
          count = 0;
          pointIndex++;
@@ -659,11 +667,14 @@ static void render()
    //key function to get up how many elements to pull out at a time (2)
    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
    //send timer value here
-   glPointSize(25);
+   //glPointSize(25);
    //actually draw from vertex 0, 2 vertices
-   glDrawArrays(GL_POINTS, 0, cubeSize * cubeSize * cubeSize);
+   //glDrawArrays(GL_POINTS, 0, cubeSize * cubeSize * cubeSize);
+   glDrawArrays(GL_TRIANGLES, 0, 3);
    glDisableVertexAttribArray(0);
    prog->unbind();
+   MV->popMatrix();
+   P->popMatrix();
 }
 
 int main(int argc, char **argv)
@@ -714,13 +725,34 @@ int main(int argc, char **argv)
    //set the window resize call back
    glfwSetFramebufferSizeCallback(window, resize_callback);
 
+   cout << "before init stuff" << endl;
+
    initCube();
    initPoints();
+   cout << "before initAllCubes" << endl;
+   initAllCubes();
+
+   theTriangles = (Triangle*) malloc(sizeof(Triangle)*5);
+
+   cout << "just before polygonise" << endl;
 
    //(cubeSize - 1)^2
    int i;
    for (i = 0; i < 81; i++) {
-      Polygonise(cubes[i], isolvl, theTriangles);
+      int nTri = Polygonise(cubes[i], isolvl, theTriangles);
+      cout << nTri << endl;
+      int j;
+      for (j = 0; j < nTri; j++) {
+         posBuf.push_back(theTriangles[j].p1.x);
+         posBuf.push_back(theTriangles[j].p1.y);
+         posBuf.push_back(theTriangles[j].p1.z);
+         posBuf.push_back(theTriangles[j].p2.x);
+         posBuf.push_back(theTriangles[j].p2.y);
+         posBuf.push_back(theTriangles[j].p2.z);
+         posBuf.push_back(theTriangles[j].p3.x);
+         posBuf.push_back(theTriangles[j].p3.y);
+         posBuf.push_back(theTriangles[j].p3.z);
+      }
    }
 
    // Initialize scene. Note geometry initialized in init now
