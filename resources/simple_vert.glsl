@@ -1,14 +1,12 @@
-#version  330 core
-layout(location = 0) in vec3 vertPos;
+#version 120
+
 uniform mat4 P;
-uniform mat4 MV;
-uniform float radius = 1.0;
-out vec3 position;
+attribute vec3 vertPos;
+attribute vec3 vertCol;
+varying vec3 vMyColor;
 
 void main()
 {
-   //implicit eq of circle x^2 + y^2 + z^2 < 1 
-
-   gl_Position =  P * MV * vec4(vertPos.x, vertPos.y, vertPos.z, 1.0);
-   position = vertPos;
+	gl_Position = P * vec4(vertPos, 1.0);
+	vMyColor = vec3(0.5*vertCol.r, vertCol.g, vertCol.b);
 }

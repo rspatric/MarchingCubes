@@ -7,8 +7,10 @@
 #include "GLSL.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
+#include <cassert>
 #include <cstring>
+
+using namespace std;
 
 namespace GLSL {
 
@@ -34,67 +36,6 @@ const char * errorString(GLenum err)
 	}
 }
 
-int printError()
-{
-	// Returns 1 if an OpenGL error occurred, 0 otherwise.
-	GLenum glErr;
-	int retCode = 0;
-	
-	glErr = glGetError();
-	while(glErr != GL_NO_ERROR) {
-		printf("glError in file %s @ line %d: %s\n", __FILE__, __LINE__, errorString(glErr));
-		retCode = 1;
-		glErr = glGetError();
-	}
-	return retCode;
-}
-
-void printShaderInfoLog(GLuint shader)
-{
-	GLint infologLength = 0;
-	GLint charsWritten  = 0;
-	GLchar *infoLog;
-	
-	printError();
-	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
-	printError();
-	
-	if(infologLength > 0) {
-		infoLog = (GLchar *)malloc(infologLength);
-		if(infoLog == NULL) {
-			puts("ERROR: Could not allocate InfoLog buffer");
-			exit(1);
-		}
-		glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
-		printf("Shader InfoLog:\n%s\n\n", infoLog);
-		free(infoLog);
-	}
-	printError();
-}
-
-void printProgramInfoLog(GLuint program)
-{
-	GLint infologLength = 0;
-	GLint charsWritten  = 0;
-	GLchar *infoLog;
-	
-	printError();
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infologLength);
-	printError();
-	
-	if(infologLength > 0) {
-		infoLog = (GLchar *)malloc(infologLength);
-		if(infoLog == NULL) {
-			puts("ERROR: Could not allocate InfoLog buffer");
-			exit(1);
-		}
-		glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
-		printf("Program InfoLog:\n%s\n\n", infoLog);
-		free(infoLog);
-	}
-	printError();
-}
-
 void checkVersion()
 {
 	int major, minor;
@@ -110,6 +51,64 @@ void checkVersion()
 	}
 }
 
+void checkError(const char *str)
+{
+	GLenum glErr = glGetError();
+	if(glErr != GL_NO_ERROR) {
+		if(str) {
+			printf("%s: ", str);
+		}
+		printf("GL_ERROR = %s.\n", errorString(glErr));
+		assert(false);
+	}
+}
+
+void printShaderInfoLog(GLuint shader)
+{
+	GLint infologLength = 0;
+	GLint charsWritten  = 0;
+	GLchar *infoLog = 0;
+	
+	checkError(GET_FILE_LINE);
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
+	checkError(GET_FILE_LINE);
+	
+	if(infologLength > 0) {
+		infoLog = (GLchar *)malloc(infologLength);
+		if(infoLog == NULL) {
+			puts("ERROR: Could not allocate InfoLog buffer");
+			exit(1);
+		}
+		glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
+		checkError(GET_FILE_LINE);
+		printf("Shader InfoLog:\n%s\n\n", infoLog);
+		free(infoLog);
+	}
+}
+
+void printProgramInfoLog(GLuint program)
+{
+	GLint infologLength = 0;
+	GLint charsWritten  = 0;
+	GLchar *infoLog = 0;
+	
+	checkError(GET_FILE_LINE);
+	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infologLength);
+	checkError(GET_FILE_LINE);
+	
+	if(infologLength > 0) {
+		infoLog = (GLchar *)malloc(infologLength);
+		if(infoLog == NULL) {
+			puts("ERROR: Could not allocate InfoLog buffer");
+			exit(1);
+		}
+		glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
+		checkError(GET_FILE_LINE);
+		printf("Program InfoLog:\n%s\n\n", infoLog);
+		free(infoLog);
+	}
+}
+	
 char *textFileRead(const char *fn)
 {
 	FILE *fp;
@@ -134,7 +133,7 @@ char *textFileRead(const char *fn)
 	return content;
 }
 
-int textFileWrite(const char *fn, char *s)
+int textFileWrite(const char *fn, const char *s)
 {
 	FILE *fp;
 	int status = 0;
@@ -148,46 +147,6 @@ int textFileWrite(const char *fn, char *s)
 		}
 	}
 	return(status);
-}
-
-GLint getAttribLocation(const GLuint program, const char varname[], bool verbose)
-{
-	GLint r = glGetAttribLocation(program, varname);
-	if (r < 0 && verbose)
-		std::cerr << "WARN: "<< varname << " cannot be bound (it either doesn't exist or has been optimized away). safe_glAttrib calls will silently ignore it.\n" << std::endl;
-	return r;
-}
-
-
-GLint getUniformLocation(const GLuint program, const char varname[], bool verbose)
-{
-	GLint r = glGetUniformLocation(program, varname);
-	if(r < 0 && verbose) {
-		std::cerr << "WARN: "<< varname << " cannot be bound (it either doesn't exist or has been optimized away). safe_glUniform calls will silently ignore it.\n" << std::endl;
-	}
-	return r;
-}
-
-
-void enableVertexAttribArray(const GLint handle)
-{
-	if(handle >= 0) {
-		glEnableVertexAttribArray(handle);
-	}
-}
-
-void disableVertexAttribArray(const GLint handle)
-{
-	if(handle >= 0) {
-		glDisableVertexAttribArray(handle);
-	}
-}
-
-void vertexAttribPointer(const GLint handle, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer)
-{
-	if(handle >= 0) {
-		glVertexAttribPointer(handle, size, type, normalized, stride, pointer);
-	}
 }
 
 }
