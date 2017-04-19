@@ -113,8 +113,8 @@ static void resize_callback(GLFWwindow *window, int width, int height)
 
 // implicit equation of a sphere
 double calcVal(Point p) {
-	return (p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 25;
-		//max(abs(p.x), max(abs(p.y), abs(p.z)));
+	return //(p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 1;
+		max(abs(p.x), max(abs(p.y), abs(p.z)));
 		//(p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 4;
 }
 
@@ -142,54 +142,27 @@ std::vector<Cube> initCubes(vector<Point> points, int cubesize) {
 	vector<Cube> cubes;
 	int index = 0;
 
-	while (index < points.size()) {
-		if (points[index].x != cubesize - 1 && 
-			points[index].y != cubesize - 1 && 
-			points[index].z != cubesize - 1
-			//index + cubesize*cubesize + cubesize + 1 < points.size()
-			) {
-			Point p = points[index];
-			Point p0 = { p.x, p.y, p.z };
-			Point p1 = { p.x + 1, p.y, p.z };
-			Point p2 = { p.x + 1, p.y, p.z };
-			Point p3 = { p.x, p.y, p.z + 1 };
-			Point p4 = { p.x, p.y + 1, p.z };
-			Point p5 = { p.x + 1, p.y + 1, p.z };
-			Point p6 = { p.x + 1, p.y + 1, p.z + 1 };
-			Point p7 = { p.x, p.y + 1, p.z + 1 };
+	for (int z = -cubesize / 2; z < cubesize / 2; z++) {
+		for (int y = -cubesize / 2; y < cubesize / 2; y++) {
+			for (int x = -cubesize / 2; x < cubesize / 2; x++) {
+				if (x != cubesize / 2 - 1 &&
+					y != cubesize / 2 - 1 &&
+					z != cubesize / 2 - 1) {
+					Point p0 = { x, y, z };
+					Point p1 = { x + 1, y, z };
+					Point p2 = { x + 1, y, z + 1 };
+					Point p3 = { x, y, z + 1 };
+					Point p4 = { x, y + 1, z };
+					Point p5 = { x + 1, y + 1, z };
+					Point p6 = { x + 1, y + 1, z + 1 };
+					Point p7 = { x, y + 1, z + 1 };
 
-			Cube cube = { {p0, p1, p2, p3, p4, p5, p6, p7},
-			{calcVal(p0), calcVal(p1), calcVal(p2), calcVal(p3), calcVal(p4), calcVal(p5), calcVal(p6), calcVal(p7)} };
-			cubes.push_back(cube);
-			/*Cube cube = { {points[index],
-				points[index + 1],
-				points[index + cubesize*cubesize + 1],
-				points[index + cubesize*cubesize],
-				points[index + cubesize],
-				points[index + cubesize + 1],
-				points[index + cubesize*cubesize + cubesize + 1],
-				points[index + cubesize*cubesize + cubesize]},
-				{ calcVal(points[index]),
-				calcVal(points[index + 1]),
-				calcVal(points[index + cubesize + 1]),
-				calcVal(points[index + cubesize]),
-				calcVal(points[index + cubesize*cubesize]),
-				calcVal(points[index + cubesize*cubesize + 1]),
-				calcVal(points[index + cubesize*cubesize + cubesize + 1]),
-				calcVal(points[index + cubesize*cubesize + cubesize]) } };
-
-			cout << "Values: " << endl;
-			cout << calcVal(points[index]) << endl;
-			cout << calcVal(points[index + 1]) << endl;
-			cout << calcVal(points[index + cubesize + 1]) << endl;
-			cout << calcVal(points[index + cubesize]) << endl;
-			cout << calcVal(points[index + cubesize*cubesize]) << endl;
-			cout << calcVal(points[index + cubesize*cubesize + 1]) << endl;
-			cout << calcVal(points[index + cubesize*cubesize + cubesize + 1]) << endl;
-			cout << calcVal(points[index + cubesize*cubesize + cubesize]) << endl;
-			cubes.push_back(cube);*/
+					Cube cube = { {p0, p1, p2, p3, p4, p5, p6, p7},
+					{calcVal(p0), calcVal(p1), calcVal(p2), calcVal(p3), calcVal(p4), calcVal(p5), calcVal(p6), calcVal(p7)} };
+					cubes.push_back(cube);
+				}
+			}
 		}
-		index++;
 	}
 
 	return cubes;
@@ -663,16 +636,16 @@ static void init()
 	// Vertex Color Data
 	vector<float> colorBuf;
 
-	int cubesize = 50;
-	double isolevel = 500;
+	int cubesize = 20;
+	double isolevel = 5;
 	vector<Point> points = initPoints(cubesize);
 	vector<Cube> cubes = initCubes(points, cubesize);
 
 	for (int i = 0; i < cubes.size(); i++) {
 		Triangle triangles[5];
 		int numTri = Polygonise(cubes[i], isolevel, triangles);
-		if (numTri > 1)
-			cout << "numTri: " << numTri << endl;
+		//if (numTri > 1)
+		//	cout << "numTri: " << numTri << endl;
 		//cout << "actualTri: " << sizeof(triangles)/sizeof(Triangle) << endl;
 		for (int j = 0; j < numTri; j++) {
 			posBuf.push_back(triangles[j].p[0].x / (cubesize / 4));
@@ -698,12 +671,12 @@ static void init()
 
 			colorBuf.push_back(0.0f); // r
 			colorBuf.push_back(0.0f); // g
-			colorBuf.push_back(0.9f); // b
-			colorBuf.push_back(1.0f); // r
-			colorBuf.push_back(0.0f); // g
-			colorBuf.push_back(0.0f); // b
+			colorBuf.push_back(1.0f); // b
 			colorBuf.push_back(0.0f); // r
 			colorBuf.push_back(1.0f); // g
+			colorBuf.push_back(0.0f); // b
+			colorBuf.push_back(1.0f); // r
+			colorBuf.push_back(0.0f); // g
 			colorBuf.push_back(0.0f); // b
 		}
 	}
