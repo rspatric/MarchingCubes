@@ -113,7 +113,9 @@ static void resize_callback(GLFWwindow *window, int width, int height)
 
 // implicit equation of a sphere
 double calcVal(Point p) {
-	return (p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 4;
+	return (p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 25;
+		//max(abs(p.x), max(abs(p.y), abs(p.z)));
+		//(p.x * p.x) + (p.y * p.y) + (p.z * p.z) - 4;
 }
 
 // Makes the cube of points
@@ -143,9 +145,23 @@ std::vector<Cube> initCubes(vector<Point> points, int cubesize) {
 	while (index < points.size()) {
 		if (points[index].x != cubesize - 1 && 
 			points[index].y != cubesize - 1 && 
-			points[index].z != cubesize - 1 &&
-			index + cubesize*cubesize + cubesize + 1 < points.size()) {
-			Cube cube = { {points[index],
+			points[index].z != cubesize - 1
+			//index + cubesize*cubesize + cubesize + 1 < points.size()
+			) {
+			Point p = points[index];
+			Point p0 = { p.x, p.y, p.z };
+			Point p1 = { p.x + 1, p.y, p.z };
+			Point p2 = { p.x + 1, p.y, p.z };
+			Point p3 = { p.x, p.y, p.z + 1 };
+			Point p4 = { p.x, p.y + 1, p.z };
+			Point p5 = { p.x + 1, p.y + 1, p.z };
+			Point p6 = { p.x + 1, p.y + 1, p.z + 1 };
+			Point p7 = { p.x, p.y + 1, p.z + 1 };
+
+			Cube cube = { {p0, p1, p2, p3, p4, p5, p6, p7},
+			{calcVal(p0), calcVal(p1), calcVal(p2), calcVal(p3), calcVal(p4), calcVal(p5), calcVal(p6), calcVal(p7)} };
+			cubes.push_back(cube);
+			/*Cube cube = { {points[index],
 				points[index + 1],
 				points[index + cubesize*cubesize + 1],
 				points[index + cubesize*cubesize],
@@ -161,7 +177,17 @@ std::vector<Cube> initCubes(vector<Point> points, int cubesize) {
 				calcVal(points[index + cubesize*cubesize + 1]),
 				calcVal(points[index + cubesize*cubesize + cubesize + 1]),
 				calcVal(points[index + cubesize*cubesize + cubesize]) } };
-			cubes.push_back(cube);
+
+			cout << "Values: " << endl;
+			cout << calcVal(points[index]) << endl;
+			cout << calcVal(points[index + 1]) << endl;
+			cout << calcVal(points[index + cubesize + 1]) << endl;
+			cout << calcVal(points[index + cubesize]) << endl;
+			cout << calcVal(points[index + cubesize*cubesize]) << endl;
+			cout << calcVal(points[index + cubesize*cubesize + 1]) << endl;
+			cout << calcVal(points[index + cubesize*cubesize + cubesize + 1]) << endl;
+			cout << calcVal(points[index + cubesize*cubesize + cubesize]) << endl;
+			cubes.push_back(cube);*/
 		}
 		index++;
 	}
@@ -637,14 +663,17 @@ static void init()
 	// Vertex Color Data
 	vector<float> colorBuf;
 
-	int cubesize = 20;
-	double isolevel = 10;
+	int cubesize = 50;
+	double isolevel = 500;
 	vector<Point> points = initPoints(cubesize);
 	vector<Cube> cubes = initCubes(points, cubesize);
 
 	for (int i = 0; i < cubes.size(); i++) {
 		Triangle triangles[5];
 		int numTri = Polygonise(cubes[i], isolevel, triangles);
+		if (numTri > 1)
+			cout << "numTri: " << numTri << endl;
+		//cout << "actualTri: " << sizeof(triangles)/sizeof(Triangle) << endl;
 		for (int j = 0; j < numTri; j++) {
 			posBuf.push_back(triangles[j].p[0].x / (cubesize / 4));
 			posBuf.push_back(triangles[j].p[0].y / (cubesize / 4));
@@ -655,6 +684,17 @@ static void init()
 			posBuf.push_back(triangles[j].p[2].x / (cubesize / 4));
 			posBuf.push_back(triangles[j].p[2].y / (cubesize / 4));
 			posBuf.push_back(triangles[j].p[2].z / (cubesize / 4));
+
+			/*cout << "Triangle : " << endl;
+			cout << triangles[j].p[0].x / (cubesize / 4) << endl;
+			cout << triangles[j].p[0].y / (cubesize / 4) << endl;
+			cout << triangles[j].p[0].z / (cubesize / 4) << endl;
+			cout << triangles[j].p[1].x / (cubesize / 4) << endl;
+			cout << triangles[j].p[1].y / (cubesize / 4) << endl;
+			cout << triangles[j].p[1].z / (cubesize / 4) << endl;
+			cout << triangles[j].p[2].x / (cubesize / 4) << endl;
+			cout << triangles[j].p[2].y / (cubesize / 4) << endl;
+			cout << triangles[j].p[2].z / (cubesize / 4) << endl;*/
 
 			colorBuf.push_back(0.0f); // r
 			colorBuf.push_back(0.0f); // g
